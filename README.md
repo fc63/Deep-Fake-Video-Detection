@@ -1,3 +1,4 @@
+﻿
 # DeepFake Detection with CNNs & Transfer Learning
 
 This assignment is part of the **CENG 481 - Artificial Neural Networks** course assignment.
@@ -28,9 +29,10 @@ It addresses the task of detecting deepfake content using image-based CNN classi
 ## 🧠 Model
 
 - Base: `EfficientNetB0`, pretrained on ImageNet
-- Input size: 224x224x3
-- Layers: GlobalAveragePooling2D + Dropout(0.4) + Dense(1, sigmoid)
-- Optimizer: Adam (lr=1e-5)
+- Frozen base trained with custom head; then base unfrozen and fine-tuned
+- Architecture: GlobalAveragePooling2D → Dropout(0.4) → Dense(1, sigmoid)
+- Input size: 224×224×3
+- Optimizer: Adam (`lr=1e-4` frozen, `lr=1e-5` unfrozen)
 - Loss: Binary Crossentropy
 - Metrics: AUC, Accuracy, Precision, Recall, F1
 
@@ -38,21 +40,23 @@ It addresses the task of detecting deepfake content using image-based CNN classi
 
 ## 🏋️ Training
 
-- Balanced dataset from 6784 images (real/fake)
-- Split: 79% train / 21% test
+- Balanced dataset from 6784 images (REAL + FAKE)
+- Train/Test split: 79% / 21% (stratified)
 - Batch size: 32
-- Epochs: 100 (with early stopping and model checkpointing)
+- Epochs: max 100 (early stopping with patience=8)
+- Model checkpointing enabled (.keras format)
+- TensorBoard used for experiment tracking
 - Platform: Google Colab (GPU)
 
 ---
 
-## 🧪 Evaluation
+## 🧪 Evaluation (Final Results)
 
-- Accuracy: 0.78
-- AUC-ROC: 0.91
-- Precision: 0.71
-- Recall: 0.95
-- F1-Score: 0.81
+- Accuracy: 0.80
+- AUC-ROC: 0.88
+- Precision: 0.78
+- Recall: 0.82
+- F1-Score: 0.80
 
 ---
 
@@ -72,7 +76,7 @@ def preprocess_image(path):
     return img.astype(np.float32)
 
 # Download and load model
-model_path = hf_hub_download(repo_id="fc63/deepfake-detection-cnn", filename="best_model.h5")
+model_path = hf_hub_download(repo_id="fc63/deepfake-detection-cnn_v2", filename="best_model.keras")
 model = load_model(model_path)
 
 # Predict
@@ -99,7 +103,7 @@ huggingface_hub
 
 ## 🔗 Repositories
 
-- 🤗 Model: https://huggingface.co/fc63/deepfake-detection-cnn
+- 🤗 Model: https://huggingface.co/fc63/deepfake-detection-cnn_v2
 - 💻 Codebase: https://github.com/fc63/Deep-Fake-Video-Detection
 
 ---
